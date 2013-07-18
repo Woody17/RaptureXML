@@ -62,9 +62,9 @@
     return [self initFromXMLData:[NSData dataWithContentsOfFile:fullPath]];
 }
 
-- (id)initFromXMLFile:(NSString *)filename {
-    NSString *fullPath = [[[NSBundle bundleForClass:self.class] bundlePath] stringByAppendingPathComponent:filename];
-    return [self initFromXMLFilePath:fullPath];
+- (id)initFromXMLFile:(NSString *)filename encoding:(NSStringEncoding)encoding {
+    NSString *xmlString = [[NSString alloc] initWithContentsOfFile:filename encoding:encoding error:nil];
+    return [self initFromXMLString:xmlString encoding:encoding];
 }
 
 - (id)initFromXMLFile:(NSString *)filename fileExtension:(NSString *)extension {
@@ -119,8 +119,8 @@
     return [[RXMLElement alloc] initFromXMLFilePath:fullPath];
 }
 
-+ (id)elementFromXMLFile:(NSString *)filename {
-    return [[RXMLElement alloc] initFromXMLFile:filename];    
++ (id)elementFromXMLFile:(NSString *)filename encoding:(NSStringEncoding)encoding; {
+    return [[RXMLElement alloc] initFromXMLFile:filename encoding:encoding];
 }
 
 + (id)elementFromXMLFilename:(NSString *)filename fileExtension:(NSString *)extension {
@@ -294,6 +294,22 @@
     return nil;
 }
 
+- (NSArray *)children
+{
+    NSMutableArray *children = [NSMutableArray array];
+    xmlNodePtr cur = node_->children;
+    
+    while (cur != nil) {
+        if (cur->type == XML_ELEMENT_NODE) {
+            [children addObject:[RXMLElement elementFromXMLDoc:self.xmlDoc node:cur]];
+        }
+        
+        cur = cur->next;
+    }
+    
+    return [children copy];
+}
+
 - (NSArray *)children:(NSString *)tag {
     const xmlChar *tagC = (const xmlChar *)[tag cStringUsingEncoding:NSUTF8StringEncoding];
     NSMutableArray *children = [NSMutableArray array];
@@ -366,6 +382,11 @@
 }
 
 #pragma mark -
+- (void)iterateChildrenUsingBlock:(void (^)(RXMLElement *))blk
+{
+    NSArray *children = [self children];
+    [self iterateElements:children usingBlock:blk];
+}
 
 - (void)iterate:(NSString *)query usingBlock:(void (^)(RXMLElement *))blk {
     // check for a query

@@ -48,7 +48,7 @@
 }
 
 - (id)initFromXMLString:(NSString *)xmlString encoding:(NSStringEncoding)encoding;
-- (id)initFromXMLFile:(NSString *)filename;
+- (id)initFromXMLFile:(NSString *)filename encoding:(NSStringEncoding)encoding;
 - (id)initFromXMLFile:(NSString *)filename fileExtension:(NSString*)extension;
 - (id)initFromXMLFilePath:(NSString *)fullPath;
 - (id)initFromURL:(NSURL *)url __attribute__((deprecated));
@@ -56,7 +56,7 @@
 - (id)initFromXMLDoc:(RXMLDocHolder *)doc node:(xmlNodePtr)node;
 
 + (id)elementFromXMLString:(NSString *)xmlString encoding:(NSStringEncoding)encoding;
-+ (id)elementFromXMLFile:(NSString *)filename;
++ (id)elementFromXMLFile:(NSString *)filename encoding:(NSStringEncoding)encoding;
 + (id)elementFromXMLFilename:(NSString *)filename fileExtension:(NSString *)extension;
 + (id)elementFromXMLFilePath:(NSString *)fullPath;
 + (id)elementFromURL:(NSURL *)url __attribute__((deprecated));
@@ -77,10 +77,12 @@
 - (RXMLElement *)child:(NSString *)tag;
 - (RXMLElement *)child:(NSString *)tag inNamespace:(NSString *)ns;
 
+- (NSArray *)children;
 - (NSArray *)children:(NSString *)tag;
 - (NSArray *)children:(NSString *)tag inNamespace:(NSString *)ns;
 - (NSArray *)childrenWithRootXPath:(NSString *)xpath;
 
+- (void)iterateChildrenUsingBlock:(void (^)(RXMLElement *))blk;
 - (void)iterate:(NSString *)query usingBlock:(void (^)(RXMLElement *))blk;
 - (void)iterateWithRootXPath:(NSString *)xpath usingBlock:(void (^)(RXMLElement *))blk;
 - (void)iterateElements:(NSArray *)elements usingBlock:(void (^)(RXMLElement *))blk;
